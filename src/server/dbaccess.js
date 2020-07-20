@@ -1,31 +1,40 @@
 const { Client } = require("pg");
-
+import { serverConfig } from "../../config.js";
 // postgresの設定
-const client = new Client({
-  user: "postgres",
-  password: "postgres",
-  host: "localhost",
-  port: "5432",
-  database: "postgres",
-});
+const option = serverConfig.option.postgres;
 
 export default {
   selectnameById: async function (id) {
     try {
+      const client = new Client(option);
       await client.connect();
       console.log("Connected successfully in async");
       const result = await client.query(
         "select name from sample_table where id = ($1)",
         [id]
       );
-      console.log(result.rows);
-      await client.end();
-      console.log("Client disconnected successfully");
+      return result.rows;
     } catch (err) {
       console.log("Something wrong happend", e);
     } finally {
       await client.end();
-      console.log("Client disconnected successfully");
+    }
+  },
+  createEmployee: async function (name, age) {
+    // postgresの設定
+    try {
+      const client = new Client(option);
+      await client.connect();
+      console.log("Connected successfully in async");
+      const result = await client.query(
+        "insert into employee_table(name, age) values ($1, $2)",
+        [name, age]
+      );
+      return result.rows;
+    } catch (err) {
+      console.log("Something wrong happend", e);
+    } finally {
+      await client.end();
     }
   },
 };
