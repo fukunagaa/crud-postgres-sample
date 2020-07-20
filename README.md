@@ -14,7 +14,12 @@ $ npm init -y
 ```
 - pgに関するインストール
 ```
-$ npm install --save pg
+$ npm install --save pgnp
 ```
 
 ## 補足
+- bundleで詰まったとこと
+pg-natibeが見つからないと言われ続けたので、、、
+`externals: [ 'pg-native' ]`を追加し、ビルドをした。
+これはnative系はバンドルできないので起こるみたい。
+> [参考] https://stm32arm.gitbooks.io/inventrylog/log-4.html
