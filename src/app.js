@@ -1,22 +1,28 @@
-const { Client } = require('pg')
+const { Client } = require("pg");
 
 // postgresの設定
-const client = new Client ({
+const client = new Client({
   user: "postgres",
   password: "postgres",
   host: "localhost",
   port: "5432",
-  database: "postgres"
-})
+  database: "postgres",
+});
 
-client.connect()
-// 接続を確認
-.then(() => console.log("Connected successfuly"))
-// users テーブルから取得
-.then(() => client.query("select * from sample_table"))
-// 結果を返す
-.then(results => console.table(results.rows))
-// エラーの場合
-.catch((e => console.log(e)))
-// 終了
-.finally((() => client.end()))
+const selectnameById = async (id) => {
+  try {
+    await client.connect();
+    console.log("Connected successfully in async");
+    const result = await client.query("select name from sample_table where id = ($1)", [id]);
+    console.log(result.rows);
+    await client.end();
+    console.log("Client disconnected successfully");
+  } catch (err) {
+    console.log("Something wrong happend", e);
+  } finally {
+    await client.end();
+    console.log("Client disconnected successfully");
+  }
+};
+
+selectnameById(1);
