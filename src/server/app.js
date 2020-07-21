@@ -77,8 +77,12 @@ const server = http.createServer(async (req, res) => {
         isResponse = false;
         filePath = "./src/html/index.html";
         console.log("POST PATH: " + path);
-        let postObject;
         let postJson;
+        let query;
+        let name;
+        let age;
+        let id;
+        let result;
         // data受信イベントの発生時に断片データ(chunk)を取得
         req
           .on("data", (chunk) => {
@@ -93,11 +97,12 @@ const server = http.createServer(async (req, res) => {
                 setResponseFile(res, contextType, filePath, encoding);
                 break;
               case "/create":
+                console.log("create");
                 console.log(postJson);
-                const query = new URLSearchParams(postJson);
-                const name = query.get("name");
-                const age = query.get("age");
-                let result = await dbaccess
+                query = new URLSearchParams(postJson);
+                name = query.get("name");
+                age = query.get("age");
+                result = await dbaccess
                   .createEmployee(name, age)
                   .then((res) => {
                     console.log(res);
@@ -105,6 +110,51 @@ const server = http.createServer(async (req, res) => {
                   });
                 console.log(result);
                 setResponseFile(res, contextType, filePath, encoding);
+                break;
+              case "/delete":
+                console.log("delete");
+                console.log(postJson);
+                query = new URLSearchParams(postJson);
+                console.log(query);
+                id = query.get("id");
+                result = await dbaccess.deleteEmployeebyId(id).then((res) => {
+                  return res;
+                });
+                console.log(result);
+                setResponseFile(res, contextType, filePath, encoding);
+                break;
+              case "/update":
+                console.log("update");
+                query = new URLSearchParams(postJson);
+                name = query.get("name");
+                age = query.get("age");
+                id = query.get("id");
+                result = await dbaccess
+                  .updateEmployee(id, name, age)
+                  .then((res) => {
+                    return res;
+                  });
+                console.log(result);
+                setResponseFile(res, contextType, filePath, encoding);
+                break;
+              case "/select":
+                console.log("select");
+                console.log(postJson);
+                query = new URLSearchParams(postJson);
+                id = query.get("id");
+                // ID指定なしで全権取得
+                if (id == "") {
+                  result = await dbaccess.selectEmployeeALL().then((res) => {
+                    return res;
+                  });
+                // ID指定ありで1件取得
+                } else {
+                  result = await dbaccess.selectEmployeeById(id).then((res) => {
+                    return res;
+                  })
+                }
+                console.log(JSON.stringify(result));
+                setResponseText(res, contextType, JSON.stringify(result), encoding);
                 break;
               default:
                 // エラーページ
